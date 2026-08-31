@@ -1,29 +1,27 @@
-# Sesión de Desarrollo: Inicio de Sesión Obligatorio y Rebranding carnetb-mnxt
+# Sesión de Desarrollo: Vercel en Vivo, Login Obligatorio y Persistencia InsForge
 
 **Fecha:** 31 de Agosto de 2026  
-**Rama:** `dev`  
-**Estado:** ✅ 100% Superado (43/43 pruebas automatizadas)
+**Rama de Trabajo:** `main` / `dev`  
+**Estado:** ✅ 100% Verificado en Producción en Vercel
 
 ---
 
-## 🎯 Qué se ha hecho hoy
+## 🎯 Qué se ha hecho
 
-1. **Pantalla de Inicio de Sesión Obligatoria (`LoginGateView.jsx`):**
-   - Al entrar a la web, cualquier usuario debe iniciar sesión sí o sí (Google, Apple ID o Email) antes de acceder al contenido.
-   - Garantiza que desde el segundo 0 cada estudiante (tú con tu Gmail y tu novia con el suyo) tenga su propio progreso, banco de fallos y exámenes aislados.
+1. **Corrección y Despliegue en Producción en Vercel:**
+   - Se sincronizó la rama `main` y se desplegó la versión de producción en Vercel.
+   - Verificado con Playwright en vivo contra `https://carnet-b-phi.vercel.app`.
 
-2. **Rebranding Completo:**
-   - Nombre oficial de la web actualizado a **`carnetb-mnxt`** en Navbar, HTML title, meta tags y package.json.
+2. **Inicio de Sesión Obligatorio (`LoginGateView.jsx`):**
+   - Al entrar por primera vez desde un dispositivo no autenticado, se muestra la pantalla de acceso obligatorio (Google, Apple ID, Email).
+   - Acceso bloqueado hasta autenticación para garantizar que el progreso de cada persona esté 100% separado desde el inicio.
 
-3. **Verificación y Pruebas:**
-   - **43 de 43 pruebas superadas (100%)** en Playwright.
-   - 0px de desbordamiento horizontal en todos los dispositivos móviles.
-   - 0 errores en consola de JavaScript.
+3. **Persistencia del Dispositivo ("Recordar Dispositivo"):**
+   - Una vez que un usuario inicia sesión en su móvil u ordenador, la sesión se guarda en el dispositivo y no vuelve a pedir login al recargar o volver a entrar, manteniendo sus datos sincronizados con InsForge PostgreSQL.
+   - Si el usuario desea cambiar de cuenta o cerrar sesión, puede hacerlo desde el menú superior.
 
 ---
 
-## 🚀 Enlaces en Vivo
+## 🚀 Enlace en Vivo
 
-- **Vercel:** [https://carnet-b-phi.vercel.app](https://carnet-b-phi.vercel.app)
-- **Cloudflare Pages:** [https://carnet-b.pages.dev](https://carnet-b.pages.dev)
-- **GitHub:** [https://github.com/musa3101/carnet-B](https://github.com/musa3101/carnet-B)
+- **Vercel Producción:** [https://carnet-b-phi.vercel.app](https://carnet-b-phi.vercel.app)
