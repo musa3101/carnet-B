@@ -144,3 +144,4 @@ Thumbs.db
 # Sensitive local MCP configurations & credentials
 mcp_config.json
 *.local.json
+.vercel
