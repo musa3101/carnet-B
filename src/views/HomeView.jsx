@@ -191,7 +191,7 @@ export const HomeView = () => {
               className="flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-gradient-to-r from-purple-950/60 to-indigo-950/60 hover:from-purple-900/60 hover:to-indigo-900/60 active:scale-98 text-purple-200 border border-purple-600/50 font-bold text-xs sm:text-sm transition-all shadow-md shadow-purple-950/40"
             >
               <Bot className="w-4 h-4 text-purple-400 animate-pulse" />
-              <span>Pregúntale al Profesor</span>
+              <span>Pregúntale al Profesor Musa</span>
             </button>
 
           </div>

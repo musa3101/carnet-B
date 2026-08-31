@@ -13,10 +13,12 @@
   - [x] **Panel de Progreso y Analítica** con guardado en LocalStorage.
   - [x] Full Responsive en iPhone SE (375px), iPhone 15 Pro, iPhone 15 Pro Max y iPad Mini (0px overflow).
   - [x] Suite de pruebas automatizadas Playwright con **43/43 tests superados** y 0 errores de consola.
+- [x] **Subida y Sincronización en GitHub:** Repositorio publicado en `musa3101/carnet-B` en ramas `dev` y `main`.
+- [x] **Despliegue Global en Cloudflare Pages:** Web activa en `https://carnet-b.pages.dev/` con HTTP 200 y HTTPS.
 
 ## 🔄 Tareas en Progreso
-- [x] Validación y auditoría integral en entorno local.
+- [x] Todas las tareas de la sesión completadas al 100%.
 
 ## 🚀 Próximas Mejoras Prioritarias
-- [ ] Incorporación de nuevos bancos de preguntas oficiales DGT mediante importador JSON.
-- [ ] Modo de audio continuo para escuchar los 36 resúmenes del manual en segundo plano como podcast de estudio.
+- [ ] Importación de nuevos bancos de preguntas oficiales DGT en formato JSON.
+- [ ] Modo de reproducción de audio continuo tipo podcast para escuchar los resúmenes en segundo plano.

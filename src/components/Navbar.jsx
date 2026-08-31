@@ -101,10 +101,10 @@ export const Navbar = () => {
             <button
               onClick={() => setQueryModalOpen(true)}
               className="flex items-center gap-1.5 px-2.5 py-1.5 sm:px-3 sm:py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-950/80 to-indigo-950/80 text-purple-200 border border-purple-600/50 hover:border-purple-400 hover:scale-102 transition-all shadow-md shadow-purple-900/20 shrink-0"
-              title="Pregúntale a tu Profesor Virtual de Teórica"
+              title="Pregúntale al Profesor Musa (Tutor Virtual de Teórica)"
             >
               <Bot className="w-3.5 h-3.5 text-purple-400 animate-pulse" />
-              <span className="hidden sm:inline">Profesor IA</span>
+              <span className="hidden sm:inline">Profesor Musa</span>
               <span className="text-[9px] uppercase font-mono font-bold px-1.5 py-0.2 rounded bg-purple-500/30 text-purple-300 border border-purple-400/40 hidden md:inline">
                 TUTOR
               </span>

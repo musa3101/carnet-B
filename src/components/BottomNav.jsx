@@ -19,7 +19,7 @@ export const BottomNav = () => {
     { id: 'senales', label: 'Señales', icon: AlertTriangle },
     { id: 'examen', label: 'Tests', icon: FileCheck2 },
     { id: 'flashcards', label: 'Cards', icon: Layers },
-    { id: 'tutor', label: 'Profesor', icon: Bot, isAction: true },
+    { id: 'tutor', label: 'Prof. Musa', icon: Bot, isAction: true },
   ];
 
   return (

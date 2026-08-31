@@ -32,7 +32,7 @@ export const ConsultaRapidaModal = () => {
     {
       id: 'welcome',
       sender: 'tutor',
-      text: '¡Hola! Soy tu Profesor Virtual de Teórica. He memorizado las 55.939 palabras del curso de Igor y la normativa oficial DGT 2026.\n\nPregúntame cualquier duda que tengas (por escrito o con tu voz 🎙️): diferencias entre autopista y autovía, velocidades, rotondas, luces antiniebla, tasas de alcohol, señales o trucos de examen.',
+      text: '¡Hola! Soy Musa, tu Profesor Virtual de Teórica. He memorizado las 55.939 palabras del curso de Igor y toda la normativa oficial DGT 2026.\n\nPregúntame cualquier duda que tengas (por escrito o con tu voz 🎙️): diferencias entre autopista y autovía, velocidades, rotondas, luces antiniebla, tasas de alcohol, señales o trucos de examen.',
       timestamp: 'Ahora'
     }
   ]);
@@ -323,12 +323,12 @@ export const ConsultaRapidaModal = () => {
 
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-base font-bold text-white font-display">Profesor Virtual de Teórica</h3>
+                <h3 className="text-base font-bold text-white font-display">Profesor Musa</h3>
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                  Igor & DGT 2026
+                  Tutor IA • DGT 2026
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400">Resuelve dudas, explica conceptos y te da los trucos de examen</p>
+              <p className="text-[11px] text-slate-400">Tu profesor particular para resolver dudas y darte trucos de examen</p>
             </div>
           </div>
 
@@ -585,7 +585,7 @@ export const ConsultaRapidaModal = () => {
               type="text"
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              placeholder={isListening ? "Escuchando tu pregunta..." : "Pregúntale a tu profesor (ej: '¿Diferencia entre autopista y autovía?')..."}
+              placeholder={isListening ? "Escuchando tu pregunta..." : "Pregúntale al Profesor Musa (ej: '¿Diferencia entre autopista y autovía?')..."}
               className="flex-1 bg-slate-900 border border-slate-700/80 focus:border-purple-500 rounded-2xl px-4 py-3 text-base sm:text-sm text-white placeholder:text-slate-500 outline-none transition-all shadow-inner"
             />
 
