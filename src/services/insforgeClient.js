@@ -1,8 +1,8 @@
 import { createClient } from '@insforge/sdk';
 
-// InsForge Configuration (reads from environment variables or custom instance)
-const INSFORGE_URL = import.meta.env.VITE_INSFORGE_URL || null;
-const INSFORGE_ANON_KEY = import.meta.env.VITE_INSFORGE_ANON_KEY || null;
+// InsForge Configuration (reads from environment variables or project instance)
+const INSFORGE_URL = import.meta.env.VITE_INSFORGE_URL || 'https://64yaq72v.us-east.insforge.app';
+const INSFORGE_ANON_KEY = import.meta.env.VITE_INSFORGE_ANON_KEY || 'anon_fdc360afbda63af54a67bf67d3197b8cf9ba5304110987fa85ca3033aec38fd5';
 
 let insforgeInstance = null;
 
