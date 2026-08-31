@@ -94,47 +94,61 @@ export const ConsultaRapidaModal = () => {
   }, []);
 
   const toggleVoiceInput = () => {
-    if (!recognitionRef.current) {
-      alert('Tu navegador no soporta entrada de voz. Puedes escribir tu duda en el campo de texto.');
-      return;
-    }
-    if (isListening) {
-      recognitionRef.current.stop();
+    try {
+      if (!recognitionRef.current) {
+        alert('Tu navegador no soporta entrada de voz directa. Puedes escribir tu duda en el campo de texto.');
+        return;
+      }
+      if (isListening) {
+        recognitionRef.current.stop();
+        setIsListening(false);
+      } else {
+        stopSpeaking();
+        setIsListening(true);
+        recognitionRef.current.start();
+      }
+    } catch (err) {
+      console.warn('Error with voice input:', err);
       setIsListening(false);
-    } else {
-      stopSpeaking();
-      setIsListening(true);
-      recognitionRef.current.start();
     }
   };
 
   const stopSpeaking = () => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-      setIsSpeaking(false);
+    try {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    } catch (err) {
+      console.warn('Error stopping speech:', err);
     }
+    setIsSpeaking(false);
   };
 
   const speakText = (text) => {
-    if (!('speechSynthesis' in window)) return;
-    stopSpeaking();
-    
-    // Clean text for speech
-    const cleanText = text
-      .replace(/[*#_`•]/g, '')
-      .replace(/https?:\/\/\S+/g, '')
-      .replace(/🎓|⚖️|🧠|⚠️|✅|💡|🚗|📌|🔄|📱|💺|📡|🔥|🚴|❌/g, '')
-      .substring(0, 300);
+    try {
+      if (typeof window === 'undefined' || !('speechSynthesis' in window)) return;
+      stopSpeaking();
+      
+      // Clean text for speech
+      const cleanText = text
+        .replace(/[*#_`•]/g, '')
+        .replace(/https?:\/\/\S+/g, '')
+        .replace(/🎓|⚖️|🧠|⚠️|✅|💡|🚗|📌|🔄|📱|💺|📡|🔥|🚴|❌/g, '')
+        .substring(0, 300);
 
-    const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = 'es-ES';
-    utterance.rate = 1.05;
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.lang = 'es-ES';
+      utterance.rate = 1.05;
 
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.onerror = () => setIsSpeaking(false);
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
 
-    setIsSpeaking(true);
-    window.speechSynthesis.speak(utterance);
+      setIsSpeaking(true);
+      window.speechSynthesis.speak(utterance);
+    } catch (err) {
+      console.warn('Speech synthesis not available or blocked:', err);
+      setIsSpeaking(false);
+    }
   };
 
   // High-Precision Knowledge Matching & Synthesis

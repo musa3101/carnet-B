@@ -3,12 +3,41 @@ import carnetData from '../data/carnetData.json';
 
 const ProgressContext = createContext(null);
 
+// Safe localStorage helpers (prevents crashes in Safari Private Mode or corrupted JSON)
+const safeGetJSON = (key, fallback) => {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return fallback;
+    const item = localStorage.getItem(key);
+    if (!item || item === 'undefined' || item === 'null') return fallback;
+    return JSON.parse(item);
+  } catch (e) {
+    console.warn(`[Storage] Failed to read ${key}:`, e);
+    return fallback;
+  }
+};
+
+const safeSetJSON = (key, value) => {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+  } catch (e) {
+    console.warn(`[Storage] Failed to write ${key}:`, e);
+  }
+};
+
+const safeGetStr = (key, fallback) => {
+  try {
+    if (typeof window === 'undefined' || !window.localStorage) return fallback;
+    return localStorage.getItem(key) || fallback;
+  } catch (e) {
+    return fallback;
+  }
+};
+
 export const ProgressProvider = ({ children }) => {
   // Theme state
-  const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem('carnet_theme');
-    return saved || 'dark';
-  });
+  const [theme, setTheme] = useState(() => safeGetStr('carnet_theme', 'dark'));
 
   // Navigation state (7 core modules: home, temario, senales, preguntame, tests, flashcards, progreso, topic)
   const [currentView, setCurrentView] = useState('home');
@@ -17,44 +46,21 @@ export const ProgressProvider = ({ children }) => {
   const [queryModalOpen, setQueryModalOpen] = useState(false);
 
   // User progress persisted in localStorage
-  const [completedTopics, setCompletedTopics] = useState(() => {
-    const saved = localStorage.getItem('carnet_completed_topics');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [bookmarkedTopics, setBookmarkedTopics] = useState(() => {
-    const saved = localStorage.getItem('carnet_bookmarked_topics');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [masteredFlashcards, setMasteredFlashcards] = useState(() => {
-    const saved = localStorage.getItem('carnet_mastered_flashcards');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [difficultFlashcards, setDifficultFlashcards] = useState(() => {
-    const saved = localStorage.getItem('carnet_difficult_flashcards');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [examHistory, setExamHistory] = useState(() => {
-    const saved = localStorage.getItem('carnet_exam_history');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  // Stores array of failed question IDs / objects for "Test de Errores"
-  const [failedQuestions, setFailedQuestions] = useState(() => {
-    const saved = localStorage.getItem('carnet_failed_questions');
-    return saved ? JSON.parse(saved) : [];
-  });
-
-  const [lastVisitedTopicId, setLastVisitedTopicId] = useState(() => {
-    return localStorage.getItem('carnet_last_topic') || '01';
-  });
+  const [completedTopics, setCompletedTopics] = useState(() => safeGetJSON('carnet_completed_topics', []));
+  const [bookmarkedTopics, setBookmarkedTopics] = useState(() => safeGetJSON('carnet_bookmarked_topics', []));
+  const [masteredFlashcards, setMasteredFlashcards] = useState(() => safeGetJSON('carnet_mastered_flashcards', []));
+  const [difficultFlashcards, setDifficultFlashcards] = useState(() => safeGetJSON('carnet_difficult_flashcards', []));
+  const [examHistory, setExamHistory] = useState(() => safeGetJSON('carnet_exam_history', []));
+  const [failedQuestions, setFailedQuestions] = useState(() => safeGetJSON('carnet_failed_questions', []));
+  const [lastVisitedTopicId, setLastVisitedTopicId] = useState(() => safeGetStr('carnet_last_topic', '01'));
 
   // Sync theme with HTML class
   useEffect(() => {
-    localStorage.setItem('carnet_theme', theme);
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.setItem('carnet_theme', theme);
+      }
+    } catch (e) {}
     if (theme === 'dark') {
       document.documentElement.classList.add('dark');
     } else {
@@ -64,31 +70,35 @@ export const ProgressProvider = ({ children }) => {
 
   // Persist progress in localStorage
   useEffect(() => {
-    localStorage.setItem('carnet_completed_topics', JSON.stringify(completedTopics));
+    safeSetJSON('carnet_completed_topics', completedTopics);
   }, [completedTopics]);
 
   useEffect(() => {
-    localStorage.setItem('carnet_bookmarked_topics', JSON.stringify(bookmarkedTopics));
+    safeSetJSON('carnet_bookmarked_topics', bookmarkedTopics);
   }, [bookmarkedTopics]);
 
   useEffect(() => {
-    localStorage.setItem('carnet_mastered_flashcards', JSON.stringify(masteredFlashcards));
+    safeSetJSON('carnet_mastered_flashcards', masteredFlashcards);
   }, [masteredFlashcards]);
 
   useEffect(() => {
-    localStorage.setItem('carnet_difficult_flashcards', JSON.stringify(difficultFlashcards));
+    safeSetJSON('carnet_difficult_flashcards', difficultFlashcards);
   }, [difficultFlashcards]);
 
   useEffect(() => {
-    localStorage.setItem('carnet_exam_history', JSON.stringify(examHistory));
+    safeSetJSON('carnet_exam_history', examHistory);
   }, [examHistory]);
 
   useEffect(() => {
-    localStorage.setItem('carnet_failed_questions', JSON.stringify(failedQuestions));
+    safeSetJSON('carnet_failed_questions', failedQuestions);
   }, [failedQuestions]);
 
   useEffect(() => {
-    localStorage.setItem('carnet_last_topic', lastVisitedTopicId);
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        localStorage.setItem('carnet_last_topic', lastVisitedTopicId);
+      }
+    } catch (e) {}
   }, [lastVisitedTopicId]);
 
   // Global keyboard shortcut for Search (CMD+K or CTRL+K)
