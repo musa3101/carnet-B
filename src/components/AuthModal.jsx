@@ -11,13 +11,13 @@ import {
   Users
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { BrandLogo } from './BrandLogo';
 
 export const AuthModal = () => {
   const { 
     authModalOpen, 
     setAuthModalOpen, 
     loginWithGoogle, 
-    loginWithApple, 
     loginWithEmail, 
     signupWithEmail,
     user
@@ -57,17 +57,17 @@ export const AuthModal = () => {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
       <div 
-        className="w-full max-w-md bg-[#0F1422] border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden text-slate-100"
+        className="w-full max-w-md bg-[#0F172A] border border-slate-700/80 rounded-3xl p-6 sm:p-8 shadow-2xl relative overflow-hidden text-slate-100"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Glow decoration */}
-        <div className="absolute -top-24 -right-24 w-48 h-48 bg-purple-500/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-sky-500/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -top-24 -right-24 w-48 h-48 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none" />
 
         {/* Close button */}
         <button
           onClick={() => setAuthModalOpen(false)}
-          className="absolute top-5 right-5 p-2 rounded-2xl bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+          className="absolute top-5 right-5 p-2 rounded-2xl bg-slate-800/80 hover:bg-slate-700 text-slate-400 hover:text-white transition-colors cursor-pointer"
           title="Cerrar ventana"
         >
           <X className="w-4 h-4" />
@@ -75,27 +75,23 @@ export const AuthModal = () => {
 
         {/* Header */}
         <div className="text-center space-y-2 mb-6">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-600 p-[1.5px] mx-auto shadow-lg shadow-sky-500/20">
-            <div className="w-full h-full bg-[#0B0F17] rounded-[14px] flex items-center justify-center text-sky-400">
-              <Users className="w-6 h-6" />
-            </div>
+          <div className="flex justify-center mb-2">
+            <BrandLogo size="md" />
           </div>
           <h2 className="text-xl sm:text-2xl font-bold font-display text-white tracking-tight">
             {user ? 'Cambiar de Cuenta' : 'Inicia Sesión en carnetb-mnxt'}
           </h2>
-          <p className="text-xs text-slate-400 max-w-xs mx-auto">
+          <p className="text-xs text-slate-300 max-w-xs mx-auto">
             Guarda tus estadísticas, exámenes y temas de forma 100% independiente.
           </p>
         </div>
 
-        {/* OAuth Buttons (Google & Apple) */}
-        <div className="space-y-2.5 mb-6">
-          
-          {/* Google Button */}
+        {/* Google Fast Login Button */}
+        <div className="space-y-3 mb-6">
           <button
             type="button"
             onClick={loginWithGoogle}
-            className="w-full py-3 px-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-semibold text-xs sm:text-sm flex items-center justify-center gap-3 transition-all shadow-md active:scale-98"
+            className="w-full py-3.5 px-4 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs sm:text-sm flex items-center justify-center gap-3 transition-all shadow-md active:scale-98 cursor-pointer"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -105,28 +101,15 @@ export const AuthModal = () => {
             </svg>
             <span>Continuar con Google (Gmail)</span>
           </button>
-
-          {/* Apple Button */}
-          <button
-            type="button"
-            onClick={loginWithApple}
-            className="w-full py-3 px-4 rounded-2xl bg-black hover:bg-slate-950 text-white border border-slate-700 font-semibold text-xs sm:text-sm flex items-center justify-center gap-3 transition-all shadow-md active:scale-98"
-          >
-            <svg className="w-4 h-4 fill-current" viewBox="0 0 170 170">
-              <path d="M150.37 130.25c-2.45 5.66-5.35 10.87-8.71 15.66-4.58 6.53-8.33 11.05-11.22 13.56-4.48 4.12-9.28 6.23-14.42 6.35-3.69 0-8.14-1.05-13.32-3.18-5.19-2.12-9.97-3.17-14.34-3.17-4.58 0-9.49 1.05-14.75 3.17-5.26 2.13-9.5 3.24-12.74 3.35-4.35.13-9.16-1.9-14.42-6.08-3.7-3.04-7.6-7.71-11.71-14.01-6.19-9.5-11-20.3-14.42-32.4-3.43-12.1-5.14-23.75-5.14-34.94 0-14.6 3.6-26.68 10.81-36.25 7.21-9.57 16.32-14.42 27.33-14.54 4.89 0 10.51 1.25 16.85 3.76 6.34 2.5 10.3 3.82 11.88 3.94 1.8.12 5.92-1.28 12.37-4.2 6.45-2.92 12.26-4.26 17.43-4.02 13.49.65 24.36 5.6 32.61 14.86-11.88 7.18-17.73 16.92-17.55 29.21.18 9.8 4.02 17.92 11.53 24.36 7.51 6.43 16.29 10.15 26.33 11.16-2.29 6.86-5.06 13.62-8.31 20.29zM119.22 31.85c0-7.29 2.67-14.15 8.01-20.57 5.34-6.42 12.02-10.42 20.04-12-0.12 1.41-.02 3.03.3 4.86-.54 7.29-3.26 14.08-8.16 20.37-4.9 6.29-11.44 10.31-19.63 12.06-.36-1.42-.56-3.01-.56-4.72z" />
-            </svg>
-            <span>Continuar con Apple ID</span>
-          </button>
-
         </div>
 
         {/* Divider */}
-        <div className="relative flex items-center justify-center my-4">
-          <div className="border-t border-slate-800 w-full" />
-          <span className="bg-[#0F1422] px-3 text-[10px] uppercase font-mono text-slate-500 shrink-0">o con tu email</span>
+        <div className="relative flex items-center justify-center mb-6">
+          <div className="border-t border-slate-700 w-full" />
+          <span className="bg-[#0F172A] px-3 text-[10px] uppercase font-mono text-slate-400 shrink-0">o con email</span>
         </div>
 
-        {/* Email & Password Form */}
+        {/* Email Form */}
         <form onSubmit={handleSubmit} className="space-y-3">
           {errorMsg && (
             <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs">
@@ -142,7 +125,7 @@ export const AuthModal = () => {
                 placeholder="Tu Nombre (ej: Musa)"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs sm:text-sm text-white placeholder:text-slate-500 outline-none focus:border-sky-500 transition-colors"
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-xs sm:text-sm text-white placeholder:text-slate-500 outline-none focus:border-cyan-400 transition-colors"
               />
             </div>
           )}
@@ -154,7 +137,7 @@ export const AuthModal = () => {
               placeholder="tu-email@gmail.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs sm:text-sm text-white placeholder:text-slate-500 outline-none focus:border-sky-500 transition-colors"
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-xs sm:text-sm text-white placeholder:text-slate-500 outline-none focus:border-cyan-400 transition-colors"
             />
           </div>
 
@@ -165,37 +148,31 @@ export const AuthModal = () => {
               placeholder="Contraseña"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-800 rounded-xl text-xs sm:text-sm text-white placeholder:text-slate-500 outline-none focus:border-sky-500 transition-colors"
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-900/80 border border-slate-700 rounded-xl text-xs sm:text-sm text-white placeholder:text-slate-500 outline-none focus:border-cyan-400 transition-colors"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-xl bg-gradient-to-r from-sky-600 to-indigo-600 hover:from-sky-500 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-sky-500/20 active:scale-98 disabled:opacity-50"
+            className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-sky-500/20 active:scale-98 disabled:opacity-50 cursor-pointer"
           >
-            <span>{loading ? 'Procesando...' : mode === 'login' ? 'Iniciar Sesión' : 'Crear Cuenta'}</span>
+            <span>{loading ? 'Cargando...' : mode === 'login' ? 'Entrar' : 'Registrarse'}</span>
             <ArrowRight className="w-4 h-4" />
           </button>
         </form>
 
-        {/* Toggle Login/Signup */}
-        <div className="text-center mt-4">
+        {/* Toggle between login and signup */}
+        <div className="mt-4 text-center">
           <button
             type="button"
             onClick={() => setMode(mode === 'login' ? 'signup' : 'login')}
-            className="text-xs text-sky-400 hover:text-sky-300 transition-colors"
+            className="text-xs text-cyan-400 hover:text-cyan-300 transition-colors cursor-pointer"
           >
             {mode === 'login' 
-              ? '¿No tienes cuenta todavía? Regístrate gratis' 
-              : '¿Ya tienes una cuenta? Inicia sesión aquí'}
+              ? '¿No tienes cuenta? Crear una cuenta' 
+              : '¿Ya tienes cuenta? Iniciar Sesión'}
           </button>
-        </div>
-
-        {/* Security & Multi-user notice */}
-        <div className="mt-5 pt-4 border-t border-slate-800/80 flex items-center gap-2 text-[10px] text-slate-400 font-mono">
-          <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-          <span>Aislamiento seguro: Cada usuario tiene sus propios datos en PostgreSQL.</span>
         </div>
 
       </div>

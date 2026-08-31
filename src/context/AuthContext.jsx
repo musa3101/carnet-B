@@ -5,7 +5,8 @@ import {
   signInWithEmailPassword, 
   signUpWithEmailPassword, 
   signOutCurrentUser,
-  getActiveUser
+  getActiveUser,
+  emailToUUID
 } from '../services/insforgeClient';
 
 const AuthContext = createContext(null);
@@ -149,7 +150,7 @@ export const AuthProvider = ({ children }) => {
     
     // Scoped session
     const localUser = {
-      id: 'user_' + btoa(email).substring(0, 12),
+      id: emailToUUID(email),
       email: email,
       name: email.split('@')[0].toUpperCase(),
       provider: 'email'
@@ -184,7 +185,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     const localUser = {
-      id: 'user_' + btoa(email).substring(0, 12),
+      id: emailToUUID(email),
       email: email,
       name: name || email.split('@')[0].toUpperCase(),
       provider: 'email'

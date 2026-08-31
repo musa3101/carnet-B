@@ -46,31 +46,50 @@ export const signInWithOAuth = async (provider) => {
   });
 };
 
+const withTimeout = (promise, ms = 2000) => {
+  let timeoutId;
+  const timeoutPromise = new Promise((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error('Network timeout')), ms);
+  });
+  return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timeoutId));
+};
+
+export const emailToUUID = (email) => {
+  let hash1 = 5381;
+  let hash2 = 52711;
+  const str = String(email || 'user@local.dev').toLowerCase().trim();
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash1 = ((hash1 << 5) + hash1) ^ char;
+    hash2 = ((hash2 << 5) + hash2) ^ char;
+  }
+  const h1 = (hash1 >>> 0).toString(16).padStart(8, '0');
+  const h2 = (hash2 >>> 0).toString(16).padStart(8, '0');
+  const h3 = ((hash1 ^ hash2) >>> 0).toString(16).padStart(8, '0');
+  const h4 = ((hash1 + hash2) >>> 0).toString(16).padStart(8, '0');
+  return `${h1}-${h2.slice(0, 4)}-4${h2.slice(4, 7)}-8${h3.slice(0, 3)}-${h4}${h3.slice(4, 8)}`;
+};
+
 /**
  * Sign in with Email & Password
  */
 export const signInWithEmailPassword = async (email, password) => {
   const client = getInsforgeClient();
-  if (!client) {
-    return {
-      user: {
-        id: 'user_' + btoa(email).substring(0, 12),
-        email,
-        name: email.split('@')[0].toUpperCase()
-      }
-    };
-  }
+  const fallbackUser = {
+    user: {
+      id: emailToUUID(email),
+      email,
+      name: email.split('@')[0].toUpperCase()
+    }
+  };
+
+  if (!client) return fallbackUser;
 
   try {
-    return await client.auth.signInWithPassword({ email, password });
+    const res = await withTimeout(client.auth.signInWithPassword({ email, password }), 2000);
+    return res || fallbackUser;
   } catch (e) {
-    return {
-      user: {
-        id: 'user_' + btoa(email).substring(0, 12),
-        email,
-        name: email.split('@')[0].toUpperCase()
-      }
-    };
+    return fallbackUser;
   }
 };
 
@@ -79,30 +98,21 @@ export const signInWithEmailPassword = async (email, password) => {
  */
 export const signUpWithEmailPassword = async (email, password, name) => {
   const client = getInsforgeClient();
-  if (!client) {
-    return {
-      user: {
-        id: 'user_' + btoa(email).substring(0, 12),
-        email,
-        name: name || email.split('@')[0].toUpperCase()
-      }
-    };
-  }
+  const fallbackUser = {
+    user: {
+      id: emailToUUID(email),
+      email,
+      name: name || email.split('@')[0].toUpperCase()
+    }
+  };
+
+  if (!client) return fallbackUser;
 
   try {
-    return await client.auth.signUp({
-      email,
-      password,
-      name: name || email.split('@')[0]
-    });
+    const res = await withTimeout(client.auth.signUp({ email, password, options: { data: { full_name: name } } }), 2000);
+    return res || fallbackUser;
   } catch (e) {
-    return {
-      user: {
-        id: 'user_' + btoa(email).substring(0, 12),
-        email,
-        name: name || email.split('@')[0].toUpperCase()
-      }
-    };
+    return fallbackUser;
   }
 };
 

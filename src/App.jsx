@@ -66,8 +66,12 @@ export const App = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#0B0F17] text-slate-100 font-sans selection:bg-sky-500 selection:text-white overscroll-none">
+    <div className="min-h-screen flex flex-col bg-[#080D1A] text-slate-100 font-sans selection:bg-cyan-500 selection:text-white overscroll-none relative">
       
+      {/* Subtle Ambient Mesh Glows (Eliminates Flat Black Look) */}
+      <div className="fixed top-0 left-1/4 w-[600px] h-[600px] bg-cyan-600/5 rounded-full blur-[140px] pointer-events-none -z-10" />
+      <div className="fixed bottom-0 right-1/4 w-[600px] h-[600px] bg-indigo-600/5 rounded-full blur-[160px] pointer-events-none -z-10" />
+
       {/* Top Navbar */}
       <Navbar />
 

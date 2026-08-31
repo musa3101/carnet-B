@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useProgress } from '../context/ProgressContext';
 import { UserMenu } from './UserMenu';
+import { BrandLogo } from './BrandLogo';
 
 export const Navbar = () => {
   const { 
@@ -48,24 +49,9 @@ export const Navbar = () => {
           {/* Logo & Brand Identity */}
           <div 
             onClick={() => setCurrentView('home')}
-            className="flex items-center gap-2.5 cursor-pointer group select-none shrink-0"
+            className="cursor-pointer group select-none shrink-0"
           >
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-sky-600 via-sky-500 to-cyan-400 p-[1.5px] shadow-lg shadow-sky-500/20 group-hover:scale-105 transition-transform shrink-0">
-              <div className="w-full h-full bg-[#0B0F17] rounded-[10px] sm:rounded-[14px] flex items-center justify-center">
-                <span className="text-base sm:text-xl font-black bg-gradient-to-r from-sky-400 to-cyan-300 bg-clip-text text-transparent font-display">
-                  B
-                </span>
-              </div>
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="font-black text-base sm:text-lg tracking-tight text-white font-display">carnetb-mnxt</span>
-                <span className="text-[9px] sm:text-[10px] uppercase font-mono font-bold tracking-wider px-1.5 py-0.2 rounded bg-sky-500/15 text-sky-400 border border-sky-500/30">
-                  DGT 2026
-                </span>
-              </div>
-              <p className="text-[10px] sm:text-[11px] text-slate-400 font-medium hidden md:block">Manual Digital & Curso Igor</p>
-            </div>
+            <BrandLogo size="md" />
           </div>
 
           {/* Desktop Navigation Links (7 Modules) */}
