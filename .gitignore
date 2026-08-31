@@ -145,3 +145,18 @@ Thumbs.db
 mcp_config.json
 *.local.json
 .vercel
+
+# InsForge & AI agent skills
+.insforge
+.agent
+.agents
+.augment
+.claude
+.cline
+.github/copilot*
+.kilocode
+.qoder
+.qwen
+.roo
+.trae
+.windsurf

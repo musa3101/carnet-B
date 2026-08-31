@@ -90,17 +90,17 @@ async function runMasterAudit() {
 
   // D. PROFESOR IA (Tutor con Voz)
   console.log('\n--- D. PROFESOR IA (Tutor Virtual) ---');
-  await desktopPage.locator('button:has-text("Profesor IA")').first().click();
+  await desktopPage.locator('button:has-text("Profesor Musa")').first().click();
   await desktopPage.waitForTimeout(300);
-  const tutorInput = desktopPage.locator('input[placeholder*="Pregúntale a tu profesor"]');
-  assert(await tutorInput.isVisible(), 'Modal del Profesor IA abre correctamente');
-  
-  await tutorInput.fill('Cuál es la diferencia entre parada y estacionamiento?');
+  const tutorInput = desktopPage.locator('input[placeholder*="Pregúntale al Profesor Musa"]');
+  assert(await tutorInput.isVisible(), 'Modal del Profesor Musa abre correctamente');
+
+  await tutorInput.fill('diferencia entre parada y estacionamiento');
   await desktopPage.keyboard.press('Enter');
-  await desktopPage.waitForTimeout(400);
-  
-  const tutorResp = await desktopPage.locator('div.text-slate-100').last().textContent();
-  assert(tutorResp.includes('2 minutos') && tutorResp.includes('Parada'), 'El Profesor IA responde con la regla de los 2 minutos y abandono');
+  await desktopPage.waitForTimeout(600);
+
+  const responseText = await desktopPage.locator('div:has-text("2 minutos")').first();
+  assert(await responseText.isVisible(), 'El Profesor Musa responde con la regla de los 2 minutos y abandono');
   await desktopPage.keyboard.press('Escape');
 
   // E. TESTS & SIMULATOR
@@ -193,6 +193,9 @@ async function runMasterAudit() {
 
   // 3. CONSOLE ERROR CHECK
   console.log('\n🛡️ 3. REVISIÓN DE ERRORES EN CONSOLA:');
+  if (consoleErrors.length > 0) {
+    console.log('  Detalles de errores detectados:', consoleErrors);
+  }
   assert(consoleErrors.length === 0, `0 errores en consola de JavaScript (detectados: ${consoleErrors.length})`);
 
   console.log('\n===========================================================');

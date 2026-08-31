@@ -4,6 +4,7 @@ import { Navbar } from './components/Navbar';
 import { BottomNav } from './components/BottomNav';
 import { GlobalSearchModal } from './components/GlobalSearchModal';
 import { ConsultaRapidaModal } from './components/ConsultaRapidaModal';
+import { AuthModal } from './components/AuthModal';
 
 // Views
 import { HomeView } from './views/HomeView';
@@ -72,6 +73,7 @@ export const App = () => {
       {/* Global Modals */}
       <GlobalSearchModal />
       <ConsultaRapidaModal />
+      <AuthModal />
 
     </div>
   );

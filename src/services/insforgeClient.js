@@ -1,0 +1,208 @@
+import { createClient } from '@insforge/sdk';
+
+// Default configuration with fallback
+const INSFORGE_URL = import.meta.env.VITE_INSFORGE_URL || 'https://api.insforge.dev';
+const INSFORGE_ANON_KEY = import.meta.env.VITE_INSFORGE_ANON_KEY || 'anon_key_carnet_b_default';
+
+let insforgeInstance = null;
+
+export const getInsforgeClient = () => {
+  if (!insforgeInstance) {
+    try {
+      insforgeInstance = createClient({
+        baseUrl: INSFORGE_URL,
+        anonKey: INSFORGE_ANON_KEY,
+        autoRefreshToken: true,
+        persistSession: true,
+      });
+    } catch (e) {
+      console.warn('[InsForge] Client initialization notice:', e);
+    }
+  }
+  return insforgeInstance;
+};
+
+// --- AUTHENTICATION HELPERS ---
+
+/**
+ * Sign in with OAuth provider (Google or Apple)
+ * @param {'google' | 'apple'} provider 
+ */
+export const signInWithOAuth = async (provider) => {
+  const client = getInsforgeClient();
+  if (!client) throw new Error('Cliente InsForge no disponible');
+  
+  const currentOrigin = typeof window !== 'undefined' ? window.location.origin : '';
+  const redirectUrl = `${currentOrigin}/#auth-callback`;
+
+  return await client.auth.signInWithOAuth({
+    provider,
+    redirectTo: redirectUrl
+  });
+};
+
+/**
+ * Sign in with Email & Password
+ */
+export const signInWithEmailPassword = async (email, password) => {
+  const client = getInsforgeClient();
+  if (!client) throw new Error('Cliente InsForge no disponible');
+
+  return await client.auth.signInWithPassword({
+    email,
+    password
+  });
+};
+
+/**
+ * Sign up with Email & Password + Display Name
+ */
+export const signUpWithEmailPassword = async (email, password, name) => {
+  const client = getInsforgeClient();
+  if (!client) throw new Error('Cliente InsForge no disponible');
+
+  return await client.auth.signUp({
+    email,
+    password,
+    name: name || email.split('@')[0]
+  });
+};
+
+/**
+ * Sign out current user
+ */
+export const signOutCurrentUser = async () => {
+  const client = getInsforgeClient();
+  if (client) {
+    try {
+      await client.auth.signOut();
+    } catch (e) {
+      console.warn('[InsForge] Error during signOut:', e);
+    }
+  }
+};
+
+/**
+ * Get current authenticated user
+ */
+export const getActiveUser = async () => {
+  const client = getInsforgeClient();
+  if (!client) return null;
+  
+  // Only query server if an auth session is present
+  const hasLocalAccount = typeof window !== 'undefined' && localStorage.getItem('carnet_local_account');
+  const hasAuthToken = typeof window !== 'undefined' && (
+    localStorage.getItem('insforge_auth_token') || 
+    localStorage.getItem('insforge_session') || 
+    localStorage.getItem('sb-auth-token')
+  );
+
+  if (!hasLocalAccount && !hasAuthToken) {
+    return null;
+  }
+
+  try {
+    const user = await client.auth.getCurrentUser();
+    return user || null;
+  } catch (e) {
+    return null;
+  }
+};
+
+// --- DATABASE & SYNC HELPERS ---
+
+/**
+ * Fetch study progress from InsForge for a given user
+ */
+export const fetchStudyProgressFromCloud = async (userId) => {
+  const client = getInsforgeClient();
+  if (!client || !userId) return null;
+
+  try {
+    const { data, error } = await client.database
+      .from('user_study_progress')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    if (error) {
+      console.warn('[InsForge] Error fetching study progress:', error);
+      return null;
+    }
+    return data;
+  } catch (err) {
+    console.warn('[InsForge] Exception fetching study progress:', err);
+    return null;
+  }
+};
+
+/**
+ * Save / Upsert study progress in InsForge
+ */
+export const saveStudyProgressToCloud = async (userId, progressData) => {
+  const client = getInsforgeClient();
+  if (!client || !userId) return false;
+
+  try {
+    const payload = {
+      user_id: userId,
+      user_email: progressData.userEmail || null,
+      user_name: progressData.userName || null,
+      completed_topics: progressData.completedTopics || [],
+      bookmarked_topics: progressData.bookmarkedTopics || [],
+      mastered_flashcards: progressData.masteredFlashcards || [],
+      difficult_flashcards: progressData.difficultFlashcards || [],
+      failed_questions: progressData.failedQuestions || [],
+      last_visited_topic: progressData.lastVisitedTopicId || '01',
+      updated_at: new Date().toISOString()
+    };
+
+    const { error } = await client.database
+      .from('user_study_progress')
+      .upsert([payload], { onConflict: 'user_id' });
+
+    if (error) {
+      console.warn('[InsForge] Error saving study progress:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.warn('[InsForge] Exception saving study progress:', err);
+    return false;
+  }
+};
+
+/**
+ * Record an exam attempt in InsForge
+ */
+export const recordExamAttemptToCloud = async (userId, examResult) => {
+  const client = getInsforgeClient();
+  if (!client || !userId) return false;
+
+  try {
+    const payload = {
+      user_id: userId,
+      mode: examResult.mode || 'oficial',
+      score: examResult.score,
+      total_questions: examResult.totalQuestions,
+      passed: examResult.passed,
+      wrong_topic_ids: examResult.wrongTopicIds || [],
+      wrong_questions: examResult.wrongQuestions || [],
+      time_spent_seconds: examResult.timeSpentSeconds || 0,
+      created_at: new Date().toISOString()
+    };
+
+    const { error } = await client.database
+      .from('exam_results')
+      .insert([payload]);
+
+    if (error) {
+      console.warn('[InsForge] Error saving exam result:', error);
+      return false;
+    }
+    return true;
+  } catch (err) {
+    console.warn('[InsForge] Exception saving exam result:', err);
+    return false;
+  }
+};

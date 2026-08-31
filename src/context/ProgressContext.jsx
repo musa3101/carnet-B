@@ -1,5 +1,11 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import carnetData from '../data/carnetData.json';
+import { useAuth } from './AuthContext';
+import { 
+  fetchStudyProgressFromCloud, 
+  saveStudyProgressToCloud, 
+  recordExamAttemptToCloud 
+} from '../services/insforgeClient';
 
 const ProgressContext = createContext(null);
 
@@ -36,6 +42,9 @@ const safeGetStr = (key, fallback) => {
 };
 
 export const ProgressProvider = ({ children }) => {
+  const { user, setCloudSyncStatus } = useAuth();
+  const userId = user?.id || 'guest';
+
   // Theme state
   const [theme, setTheme] = useState(() => safeGetStr('carnet_theme', 'dark'));
 
@@ -45,14 +54,72 @@ export const ProgressProvider = ({ children }) => {
   const [searchModalOpen, setSearchModalOpen] = useState(false);
   const [queryModalOpen, setQueryModalOpen] = useState(false);
 
-  // User progress persisted in localStorage
-  const [completedTopics, setCompletedTopics] = useState(() => safeGetJSON('carnet_completed_topics', []));
-  const [bookmarkedTopics, setBookmarkedTopics] = useState(() => safeGetJSON('carnet_bookmarked_topics', []));
-  const [masteredFlashcards, setMasteredFlashcards] = useState(() => safeGetJSON('carnet_mastered_flashcards', []));
-  const [difficultFlashcards, setDifficultFlashcards] = useState(() => safeGetJSON('carnet_difficult_flashcards', []));
-  const [examHistory, setExamHistory] = useState(() => safeGetJSON('carnet_exam_history', []));
-  const [failedQuestions, setFailedQuestions] = useState(() => safeGetJSON('carnet_failed_questions', []));
-  const [lastVisitedTopicId, setLastVisitedTopicId] = useState(() => safeGetStr('carnet_last_topic', '01'));
+  // User progress scoped by user ID
+  const [completedTopics, setCompletedTopics] = useState(() => safeGetJSON(`carnet_${userId}_completed_topics`, []));
+  const [bookmarkedTopics, setBookmarkedTopics] = useState(() => safeGetJSON(`carnet_${userId}_bookmarked_topics`, []));
+  const [masteredFlashcards, setMasteredFlashcards] = useState(() => safeGetJSON(`carnet_${userId}_mastered_flashcards`, []));
+  const [difficultFlashcards, setDifficultFlashcards] = useState(() => safeGetJSON(`carnet_${userId}_difficult_flashcards`, []));
+  const [examHistory, setExamHistory] = useState(() => safeGetJSON(`carnet_${userId}_exam_history`, []));
+  const [failedQuestions, setFailedQuestions] = useState(() => safeGetJSON(`carnet_${userId}_failed_questions`, []));
+  const [lastVisitedTopicId, setLastVisitedTopicId] = useState(() => safeGetStr(`carnet_${userId}_last_topic`, '01'));
+
+  // Track initial cloud sync
+  const isInitialMount = useRef(true);
+  const syncTimeoutRef = useRef(null);
+
+  // When user switches, load user-specific data from localStorage and Cloud
+  useEffect(() => {
+    const currentScopeId = user?.id || 'guest';
+    
+    // 1. Load from local scoped storage first for instant UI
+    const localCompleted = safeGetJSON(`carnet_${currentScopeId}_completed_topics`, []);
+    const localBookmarked = safeGetJSON(`carnet_${currentScopeId}_bookmarked_topics`, []);
+    const localMastered = safeGetJSON(`carnet_${currentScopeId}_mastered_flashcards`, []);
+    const localDifficult = safeGetJSON(`carnet_${currentScopeId}_difficult_flashcards`, []);
+    const localExam = safeGetJSON(`carnet_${currentScopeId}_exam_history`, []);
+    const localFailed = safeGetJSON(`carnet_${currentScopeId}_failed_questions`, []);
+    const localLast = safeGetStr(`carnet_${currentScopeId}_last_topic`, '01');
+
+    setCompletedTopics(localCompleted);
+    setBookmarkedTopics(localBookmarked);
+    setMasteredFlashcards(localMastered);
+    setDifficultFlashcards(localDifficult);
+    setExamHistory(localExam);
+    setFailedQuestions(localFailed);
+    setLastVisitedTopicId(localLast);
+
+    // 2. If authenticated, fetch latest from InsForge Cloud
+    if (user?.id) {
+      setCloudSyncStatus('syncing');
+      fetchStudyProgressFromCloud(user.id).then(cloudData => {
+        if (cloudData) {
+          if (Array.isArray(cloudData.completed_topics)) setCompletedTopics(cloudData.completed_topics);
+          if (Array.isArray(cloudData.bookmarked_topics)) setBookmarkedTopics(cloudData.bookmarked_topics);
+          if (Array.isArray(cloudData.mastered_flashcards)) setMasteredFlashcards(cloudData.mastered_flashcards);
+          if (Array.isArray(cloudData.difficult_flashcards)) setDifficultFlashcards(cloudData.difficult_flashcards);
+          if (Array.isArray(cloudData.failed_questions)) setFailedQuestions(cloudData.failed_questions);
+          if (cloudData.last_visited_topic) setLastVisitedTopicId(cloudData.last_visited_topic);
+          setCloudSyncStatus('synced');
+        } else {
+          // First time cloud user -> push initial local data to cloud
+          saveStudyProgressToCloud(user.id, {
+            userEmail: user.email,
+            userName: user.name,
+            completedTopics: localCompleted,
+            bookmarkedTopics: localBookmarked,
+            masteredFlashcards: localMastered,
+            difficultFlashcards: localDifficult,
+            failedQuestions: localFailed,
+            lastVisitedTopicId: localLast
+          }).then(() => setCloudSyncStatus('synced'));
+        }
+      }).catch(() => {
+        setCloudSyncStatus('local');
+      });
+    } else {
+      setCloudSyncStatus('local');
+    }
+  }, [user?.id]);
 
   // Sync theme with HTML class
   useEffect(() => {
@@ -68,38 +135,69 @@ export const ProgressProvider = ({ children }) => {
     }
   }, [theme]);
 
-  // Persist progress in localStorage
+  // Persist progress to local user storage
   useEffect(() => {
-    safeSetJSON('carnet_completed_topics', completedTopics);
-  }, [completedTopics]);
+    safeSetJSON(`carnet_${userId}_completed_topics`, completedTopics);
+  }, [completedTopics, userId]);
 
   useEffect(() => {
-    safeSetJSON('carnet_bookmarked_topics', bookmarkedTopics);
-  }, [bookmarkedTopics]);
+    safeSetJSON(`carnet_${userId}_bookmarked_topics`, bookmarkedTopics);
+  }, [bookmarkedTopics, userId]);
 
   useEffect(() => {
-    safeSetJSON('carnet_mastered_flashcards', masteredFlashcards);
-  }, [masteredFlashcards]);
+    safeSetJSON(`carnet_${userId}_mastered_flashcards`, masteredFlashcards);
+  }, [masteredFlashcards, userId]);
 
   useEffect(() => {
-    safeSetJSON('carnet_difficult_flashcards', difficultFlashcards);
-  }, [difficultFlashcards]);
+    safeSetJSON(`carnet_${userId}_difficult_flashcards`, difficultFlashcards);
+  }, [difficultFlashcards, userId]);
 
   useEffect(() => {
-    safeSetJSON('carnet_exam_history', examHistory);
-  }, [examHistory]);
+    safeSetJSON(`carnet_${userId}_exam_history`, examHistory);
+  }, [examHistory, userId]);
 
   useEffect(() => {
-    safeSetJSON('carnet_failed_questions', failedQuestions);
-  }, [failedQuestions]);
+    safeSetJSON(`carnet_${userId}_failed_questions`, failedQuestions);
+  }, [failedQuestions, userId]);
 
   useEffect(() => {
     try {
       if (typeof window !== 'undefined' && window.localStorage) {
-        localStorage.setItem('carnet_last_topic', lastVisitedTopicId);
+        localStorage.setItem(`carnet_${userId}_last_topic`, lastVisitedTopicId);
       }
     } catch (e) {}
-  }, [lastVisitedTopicId]);
+  }, [lastVisitedTopicId, userId]);
+
+  // Cloud Sync Debounce for Authenticated Users
+  useEffect(() => {
+    if (!user?.id) return;
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+
+    syncTimeoutRef.current = setTimeout(() => {
+      setCloudSyncStatus('syncing');
+      saveStudyProgressToCloud(user.id, {
+        userEmail: user.email,
+        userName: user.name,
+        completedTopics,
+        bookmarkedTopics,
+        masteredFlashcards,
+        difficultFlashcards,
+        failedQuestions,
+        lastVisitedTopicId
+      }).then((ok) => {
+        if (ok) setCloudSyncStatus('synced');
+      });
+    }, 1500);
+
+    return () => {
+      if (syncTimeoutRef.current) clearTimeout(syncTimeoutRef.current);
+    };
+  }, [completedTopics, bookmarkedTopics, masteredFlashcards, difficultFlashcards, failedQuestions, lastVisitedTopicId, user?.id]);
 
   // Global keyboard shortcut for Search (CMD+K or CTRL+K)
   useEffect(() => {
@@ -155,6 +253,11 @@ export const ProgressProvider = ({ children }) => {
         return [...prev, ...newOnes];
       });
     }
+
+    // Save to InsForge Cloud in background if user is logged in
+    if (user?.id) {
+      recordExamAttemptToCloud(user.id, result);
+    }
   };
 
   const removeResolvedFailedQuestion = (questionId) => {
@@ -177,7 +280,7 @@ export const ProgressProvider = ({ children }) => {
   };
 
   const resetAllProgress = () => {
-    if (window.confirm('¿Seguro que deseas reiniciar todo tu progreso de estudio?')) {
+    if (window.confirm('¿Seguro que deseas reiniciar todo tu progreso de estudio de esta cuenta?')) {
       setCompletedTopics([]);
       setBookmarkedTopics([]);
       setMasteredFlashcards([]);
@@ -185,6 +288,18 @@ export const ProgressProvider = ({ children }) => {
       setExamHistory([]);
       setFailedQuestions([]);
       setLastVisitedTopicId('01');
+      if (user?.id) {
+        saveStudyProgressToCloud(user.id, {
+          userEmail: user.email,
+          userName: user.name,
+          completedTopics: [],
+          bookmarkedTopics: [],
+          masteredFlashcards: [],
+          difficultFlashcards: [],
+          failedQuestions: [],
+          lastVisitedTopicId: '01'
+        });
+      }
     }
   };
 

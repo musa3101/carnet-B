@@ -37,3 +37,24 @@ Si estás construyendo una web, asume que estas reglas están activas y combína
 - Todo el trabajo, pruebas locales y cambios se deben hacer exclusivamente en la rama `dev`.
 - Si el usuario te pide levantar el entorno o iniciar el startup, ejecuta el archivo `setup.sh` (si existe) para automatizar la rama `dev`, el `npm install` y el `npm run dev` / `python3 server.py`.
 - **Regla de Aprobación**: Solo realizarás commits locales en `dev`, fusiones (merge) de `dev` a `main`, o subidas (push) a Git cuando el usuario dé su aprobación explícitamente mediante expresiones como: *"ok"*, *"me gustó"*, *"merge"*, *"fusión de lo que hicimos"* o *"sube a git"*. Sin esta confirmación directa, no debes guardar ni subir ningún cambio a los repositorios remotos.
+
+<!-- INSFORGE:START -->
+## InsForge backend
+
+This project uses [InsForge](https://insforge.dev): an all-in-one, open-source Postgres-based backend (BaaS) that gives this app a database, authentication, file storage, edge functions, realtime, an AI model gateway, and payments through one platform.
+
+- **Project:** **carnet-b** (API base `https://64yaq72v.us-east.insforge.app`)
+- **Skills:** these InsForge skills are installed for supported coding agents. Reach for them before implementing any InsForge feature instead of guessing the API:
+  - `insforge`: app code with the `@insforge/sdk` client (database CRUD, auth, storage, edge functions, realtime, AI, email, and Stripe payments).
+  - `insforge-cli`: backend and infrastructure via the `insforge` CLI (projects, SQL, migrations, RLS policies, storage buckets, functions, secrets, payment setup, schedules, deploys).
+  - `insforge-debug`: diagnosing failures (SDK/HTTP errors, RLS denials, auth and OAuth issues) and running security or performance audits.
+  - `insforge-integrations`: wiring external auth providers (Clerk, Auth0, WorkOS, Better Auth, etc.) for JWT-based RLS, or the OKX x402 payment facilitator.
+  - `find-skills`: discovering additional skills on demand.
+- **Credentials:** app code reads keys from `.env.local`; the CLI reads `.insforge/project.json`. Never hardcode or commit keys.
+
+Key patterns:
+
+- Database inserts take an array: `insert([{ ... }])`.
+- Reference users with `auth.users(id)`; use `auth.uid()` in RLS policies.
+- For storage uploads, persist both the returned `url` and `key`.
+<!-- INSFORGE:END -->
