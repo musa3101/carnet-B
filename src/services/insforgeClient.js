@@ -128,8 +128,12 @@ export const getActiveUser = async () => {
   if (!client) return null;
 
   try {
-    const user = await client.auth.getCurrentUser();
-    return user || null;
+    const res = await client.auth.getCurrentUser();
+    const user = res?.data?.user || res?.user;
+    if (user && user.id) {
+      return user;
+    }
+    return null;
   } catch (e) {
     return null;
   }

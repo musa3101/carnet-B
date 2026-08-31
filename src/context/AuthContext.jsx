@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
         const client = getInsforgeClient();
         if (client && client.auth) {
           const currentUser = await getActiveUser();
-          if (currentUser) {
+          if (currentUser && currentUser.id) {
             setUser({
               id: currentUser.id,
               email: currentUser.email,
