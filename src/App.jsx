@@ -62,7 +62,7 @@ export const App = () => {
       {/* Footer (Desktop/Tablet) */}
       <footer className="hidden lg:block border-t border-slate-900 bg-slate-950/60 py-6 text-center text-xs text-slate-400 font-mono">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
-          <p>CARNET B • Manual Digital & Guía Interactiva DGT 2026</p>
+          <p>carnetb-mnxt • Manual Digital & Guía Interactiva DGT 2026</p>
           <p className="text-slate-400">Basado en las 55.939 palabras y 36 capítulos del curso intensivo de Igor</p>
         </div>
       </footer>

@@ -59,7 +59,7 @@ export const Navbar = () => {
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="font-black text-base sm:text-lg tracking-tight text-white font-display">CARNET B</span>
+                <span className="font-black text-base sm:text-lg tracking-tight text-white font-display">carnetb-mnxt</span>
                 <span className="text-[9px] sm:text-[10px] uppercase font-mono font-bold tracking-wider px-1.5 py-0.2 rounded bg-sky-500/15 text-sky-400 border border-sky-500/30">
                   DGT 2026
                 </span>

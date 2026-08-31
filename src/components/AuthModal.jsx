@@ -81,7 +81,7 @@ export const AuthModal = () => {
             </div>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold font-display text-white tracking-tight">
-            {user ? 'Cambiar de Cuenta' : 'Inicia Sesión en CARNET B'}
+            {user ? 'Cambiar de Cuenta' : 'Inicia Sesión en carnetb-mnxt'}
           </h2>
           <p className="text-xs text-slate-400 max-w-xs mx-auto">
             Guarda tus estadísticas, exámenes y temas de forma 100% independiente.
