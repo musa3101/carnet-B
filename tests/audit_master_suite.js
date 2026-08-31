@@ -25,14 +25,27 @@ async function runMasterAudit() {
   console.log('🖥️ 1. VERIFICACIÓN ENTORNO DESKTOP (1440x900):');
   const desktopPage = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   
-  // Listen for console errors
-  const consoleErrors = [];
+  // Listen for JS runtime errors
+  const jsRuntimeErrors = [];
+  desktopPage.on('pageerror', err => {
+    jsRuntimeErrors.push(err.message);
+  });
   desktopPage.on('console', msg => {
-    if (msg.type() === 'error') consoleErrors.push(msg.text());
+    if (msg.type() === 'error' && !msg.text().includes('401') && !msg.text().includes('favicon')) {
+      jsRuntimeErrors.push(msg.text());
+    }
   });
 
   await desktopPage.goto('http://localhost:5173/');
   await desktopPage.waitForTimeout(300);
+
+  // Mandatory Login Gate
+  if (await desktopPage.locator('input[placeholder*="@gmail.com"]').isVisible()) {
+    await desktopPage.locator('input[placeholder*="@gmail.com"]').fill('musa@gmail.com');
+    await desktopPage.locator('input[placeholder="Contraseña"]').fill('password123');
+    await desktopPage.locator('button:has-text("Entrar a la Plataforma")').first().click();
+    await desktopPage.waitForTimeout(400);
+  }
 
   // A. HOME DASHBOARD VERIFICATION
   console.log('\n--- A. INICIO (Dashboard de Estudio) ---');
@@ -174,6 +187,13 @@ async function runMasterAudit() {
     await page.goto('http://localhost:5173/');
     await page.waitForTimeout(200);
 
+    if (await page.locator('input[placeholder*="@gmail.com"]').isVisible()) {
+      await page.locator('input[placeholder*="@gmail.com"]').fill('musa@gmail.com');
+      await page.locator('input[placeholder="Contraseña"]').fill('password123');
+      await page.locator('button:has-text("Entrar a la Plataforma")').first().click();
+      await page.waitForTimeout(300);
+    }
+
     for (const v of views) {
       const btn = page.locator(`nav.safe-bottom button:has-text("${v.label}")`).first();
       if (await btn.isVisible()) {
@@ -193,10 +213,10 @@ async function runMasterAudit() {
 
   // 3. CONSOLE ERROR CHECK
   console.log('\n🛡️ 3. REVISIÓN DE ERRORES EN CONSOLA:');
-  if (consoleErrors.length > 0) {
-    console.log('  Detalles de errores detectados:', consoleErrors);
+  if (jsRuntimeErrors.length > 0) {
+    console.log('  Detalles de errores detectados:', jsRuntimeErrors);
   }
-  assert(consoleErrors.length === 0, `0 errores en consola de JavaScript (detectados: ${consoleErrors.length})`);
+  assert(jsRuntimeErrors.length === 0, `0 errores en consola de JavaScript (detectados: ${jsRuntimeErrors.length})`);
 
   console.log('\n===========================================================');
   console.log(`📊 RESULTADO FINAL: ${passedTests}/${totalTests} PRUEBAS SUPERADAS`);

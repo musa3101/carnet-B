@@ -1,5 +1,6 @@
 import React from 'react';
 import { useProgress } from './context/ProgressContext';
+import { useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { BottomNav } from './components/BottomNav';
 import { GlobalSearchModal } from './components/GlobalSearchModal';
@@ -7,6 +8,7 @@ import { ConsultaRapidaModal } from './components/ConsultaRapidaModal';
 import { AuthModal } from './components/AuthModal';
 
 // Views
+import { LoginGateView } from './views/LoginGateView';
 import { HomeView } from './views/HomeView';
 import { TemarioView } from './views/TemarioView';
 import { TopicDetailView } from './views/TopicDetailView';
@@ -20,6 +22,21 @@ import { ProgresoView } from './views/ProgresoView';
 
 export const App = () => {
   const { currentView } = useProgress();
+  const { isAuthenticated, loading } = useAuth();
+
+  // Show loading spinner during initial auth check
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#0B0F17] flex items-center justify-center text-sky-400">
+        <div className="w-8 h-8 rounded-full border-2 border-sky-400 border-t-transparent animate-spin" />
+      </div>
+    );
+  }
+
+  // Require login screen if not authenticated
+  if (!isAuthenticated) {
+    return <LoginGateView />;
+  }
 
   const renderView = () => {
     switch (currentView) {

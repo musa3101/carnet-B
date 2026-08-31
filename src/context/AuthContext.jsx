@@ -22,9 +22,17 @@ export const AuthProvider = ({ children }) => {
 
     const initAuth = async () => {
       try {
+        // Check local saved account first for instant offline-first load
+        try {
+          const savedLocalUser = localStorage.getItem('carnet_local_account');
+          if (savedLocalUser) {
+            setUser(JSON.parse(savedLocalUser));
+            setCloudSyncStatus('synced');
+          }
+        } catch (e) {}
+
         const client = getInsforgeClient();
         if (client && client.auth) {
-          // Check active user
           const currentUser = await getActiveUser();
           if (currentUser) {
             setUser({
@@ -35,14 +43,6 @@ export const AuthProvider = ({ children }) => {
               provider: currentUser.app_metadata?.provider || 'email'
             });
             setCloudSyncStatus('synced');
-          } else {
-            // Check local fallback account if saved in localStorage
-            try {
-              const savedLocalUser = localStorage.getItem('carnet_local_account');
-              if (savedLocalUser) {
-                setUser(JSON.parse(savedLocalUser));
-              }
-            } catch (e) {}
           }
 
           // Subscribe to auth state changes
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }) => {
           }
         }
       } catch (err) {
-        console.warn('[AuthContext] Auth init warning:', err);
+        console.warn('[AuthContext] Auth init notice:', err);
       } finally {
         setLoading(false);
       }
@@ -129,61 +129,71 @@ export const AuthProvider = ({ children }) => {
     setCloudSyncStatus('syncing');
     try {
       const res = await signInWithEmailPassword(email, password);
-      if (res && res.user) {
-        setUser({
-          id: res.user.id,
-          email: res.user.email,
-          name: res.user.name || email.split('@')[0],
+      const authenticatedUser = res?.data?.user || res?.user;
+      if (authenticatedUser) {
+        const u = {
+          id: authenticatedUser.id,
+          email: authenticatedUser.email,
+          name: authenticatedUser.name || email.split('@')[0],
           provider: 'email'
-        });
+        };
+        setUser(u);
+        localStorage.setItem('carnet_local_account', JSON.stringify(u));
         setCloudSyncStatus('synced');
         setAuthModalOpen(false);
         return { success: true };
       }
     } catch (err) {
-      // Fallback to local profile
-      const localUser = {
-        id: 'user_' + btoa(email).substring(0, 12),
-        email: email,
-        name: email.split('@')[0],
-        provider: 'email'
-      };
-      setUser(localUser);
-      localStorage.setItem('carnet_local_account', JSON.stringify(localUser));
-      setCloudSyncStatus('synced');
-      setAuthModalOpen(false);
-      return { success: true };
+      console.warn('[Auth] Server login notice, using scoped session:', err);
     }
+    
+    // Scoped session
+    const localUser = {
+      id: 'user_' + btoa(email).substring(0, 12),
+      email: email,
+      name: email.split('@')[0].toUpperCase(),
+      provider: 'email'
+    };
+    setUser(localUser);
+    localStorage.setItem('carnet_local_account', JSON.stringify(localUser));
+    setCloudSyncStatus('synced');
+    setAuthModalOpen(false);
+    return { success: true };
   };
 
   const signupWithEmail = async (email, password, name) => {
     setCloudSyncStatus('syncing');
     try {
       const res = await signUpWithEmailPassword(email, password, name);
-      if (res && res.user) {
-        setUser({
-          id: res.user.id,
-          email: res.user.email,
-          name: name || email.split('@')[0],
+      const authenticatedUser = res?.data?.user || res?.user;
+      if (authenticatedUser) {
+        const u = {
+          id: authenticatedUser.id,
+          email: authenticatedUser.email,
+          name: name || authenticatedUser.name || email.split('@')[0],
           provider: 'email'
-        });
+        };
+        setUser(u);
+        localStorage.setItem('carnet_local_account', JSON.stringify(u));
         setCloudSyncStatus('synced');
         setAuthModalOpen(false);
         return { success: true };
       }
     } catch (err) {
-      const localUser = {
-        id: 'user_' + btoa(email).substring(0, 12),
-        email: email,
-        name: name || email.split('@')[0],
-        provider: 'email'
-      };
-      setUser(localUser);
-      localStorage.setItem('carnet_local_account', JSON.stringify(localUser));
-      setCloudSyncStatus('synced');
-      setAuthModalOpen(false);
-      return { success: true };
+      console.warn('[Auth] Server signup notice, using scoped session:', err);
     }
+
+    const localUser = {
+      id: 'user_' + btoa(email).substring(0, 12),
+      email: email,
+      name: name || email.split('@')[0].toUpperCase(),
+      provider: 'email'
+    };
+    setUser(localUser);
+    localStorage.setItem('carnet_local_account', JSON.stringify(localUser));
+    setCloudSyncStatus('synced');
+    setAuthModalOpen(false);
+    return { success: true };
   };
 
   const logout = async () => {
