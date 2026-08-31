@@ -1,24 +1,21 @@
-# 🗺️ ROADMAP — CARNET B
+# Roadmap: CARNET B — Manual Digital & Plataforma de Estudio DGT 2026
 
-## ✅ Tareas Completadas
-- [x] **Fase 1:** Extracción y estructuración de la base de conocimiento del vídeo de Igor (4h 57m 57s, 36 temas, 55.939 palabras, 51 archivos Markdown).
-- [x] **Fase 1.5:** Auditoría crítica y validación 100% de consistencia, números y timestamps.
-- [x] **Fase 2 (Rediseño Profundo y Dashboard Personal):**
-  - [x] Rediseño del **Inicio** como Centro de Estudio Personal con diagnóstico de temas débiles.
-  - [x] Rediseño del **Temario y Manual Digital** con escaneo visual en capas (Lo que tienes que saber, Igor, DGT 2026, Excepciones, Ejemplos, Trampas, Mnemotécnias y Cifras clave).
-  - [x] Creación de la **Biblioteca Visual de Señales de Tráfico** con SVG vectoriales y novedades 2026 (P-35, R-118, R-120, P-21b).
-  - [x] **Profesor Virtual IA de Teórica** con respuestas exactas, síntesis y dictado por voz.
-  - [x] **Banco de Tests con 5 modalidades:** Oficial 30 Qs, Por Tema, Rápido Express 10 Qs, Repetición de Falladas y 25 Trampas DGT.
-  - [x] **Flashcards 3D** con persistencia y pestañas de **Tablas Maestras de Cifras**.
-  - [x] **Panel de Progreso y Analítica** con guardado en LocalStorage.
-  - [x] Full Responsive en iPhone SE (375px), iPhone 15 Pro, iPhone 15 Pro Max y iPad Mini (0px overflow).
-  - [x] Suite de pruebas automatizadas Playwright con **43/43 tests superados** y 0 errores de consola.
-- [x] **Subida y Sincronización en GitHub:** Repositorio publicado en `musa3101/carnet-B` en ramas `dev` y `main`.
-- [x] **Despliegue Global en Cloudflare Pages:** Web activa en `https://carnet-b.pages.dev/` con HTTP 200 y HTTPS.
+## 📌 Tareas Completadas
 
-## 🔄 Tareas en Progreso
-- [x] Todas las tareas de la sesión completadas al 100%.
+- [x] Extracción, transcripción y estructuración del curso intensivo de Igor (55.939 palabras, 36 temas).
+- [x] Biblioteca de Señales de Tráfico DGT 2026 con 68 señales vectorizadas SVG e indicador de novedades.
+- [x] Chatbot interactivo y tutor virtual: **Profesor Musa** con soporte de voz y preguntas frecuentes.
+- [x] Simulador de Exámenes DGT (Modo Oficial 30 preguntas, Express, Falladas y Trampas).
+- [x] Sistema 3D de Flashcards con atajos de teclado y tablas maestras interactivas.
+- [x] Respaldo ante fallos de carga en Safari / Chrome móvil y Web Speech API.
+- [x] Despliegue en producción en Vercel ([carnet-b-phi.vercel.app](https://carnet-b-phi.vercel.app)) y Cloudflare Pages ([carnet-b.pages.dev](https://carnet-b.pages.dev)).
+- [x] Integración de backend con **InsForge** y PostgreSQL.
+- [x] Sistema de autenticación con **Google OAuth**, **Apple ID** y **Email**.
+- [x] Aislamiento total de datos y estadísticas multi-usuario en la nube.
+- [x] Auditoría integral Playwright: 43/43 pruebas superadas al 100% y 0px de desbordamiento horizontal en móviles.
 
 ## 🚀 Próximas Mejoras Prioritarias
-- [ ] Importación de nuevos bancos de preguntas oficiales DGT en formato JSON.
-- [ ] Modo de reproducción de audio continuo tipo podcast para escuchar los resúmenes en segundo plano.
+
+- [ ] Modo offline PWA (Progressive Web App) con Service Worker para estudiar sin cobertura.
+- [ ] Exportación de informes de rendimiento y progreso en formato PDF.
+- [ ] Retos diarios y racha de estudio (gamificación).
